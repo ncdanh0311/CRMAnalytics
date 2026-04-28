@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Đăng nhập - QLKH{% endblock %}
+{% block auth_content %}
+<div class="auth-page">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">👥</div>
+      <h1 class="auth-title">Chào mừng trở lại!</h1>
+      <p class="auth-sub">Đăng nhập để quản lý khách hàng</p>
+    </div>
+    <form method="post" id="login-form">
+      {% csrf_token %}
+      <div class="form-group" style="margin-bottom:20px">
+        <label for="id_username">{{ form.username.label }}</label>
+        {{ form.username }}
+      </div>
+      <div class="form-group" style="margin-bottom:28px">
+        <label for="id_password">{{ form.password.label }}</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px">
+        🚀 Đăng nhập
+      </button>
+    </form>
+    <p style="text-align:center;margin-top:24px;font-size:13px;color:var(--text-muted)">
+      Hệ thống Quản Lý Khách Hàng &copy; 2024
+    </p>
+  </div>
+</div>
+{% endblock %}

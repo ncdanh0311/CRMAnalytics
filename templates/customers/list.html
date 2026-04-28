@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Danh sách khách hàng - QLKH{% endblock %}
+{% block page_title %}Danh sách khách hàng{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'customers:add' %}" class="btn btn-primary btn-sm">➕ Thêm mới</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="filters-bar">
+  <form method="get" style="display:contents">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" name="q" value="{{ search }}" placeholder="Tìm theo tên, mã KH, SĐT, email, sản phẩm..." id="search-input">
+    </div>
+    <a href="{% url 'customers:list' %}" class="filter-chip {% if not filter_type %}active{% endif %}">Tất cả</a>
+    <a href="?q={{ search }}&type=VIP" class="filter-chip {% if filter_type == 'VIP' %}active{% endif %}">⭐ VIP</a>
+    <a href="?q={{ search }}&type=Thường" class="filter-chip {% if filter_type == 'Thường' %}active{% endif %}">👤 Thường</a>
+    <button type="submit" class="btn btn-secondary btn-sm">Tìm kiếm</button>
+  </form>
+</div>
+
+<!-- Table -->
+<div class="card" style="padding:0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)">
+    <h3 style="font-size:15px;font-weight:700">
+      Kết quả: <span style="color:var(--accent)">{{ total_count }}</span> khách hàng
+      {% if search %} cho "<em>{{ search }}</em>"{% endif %}
+    </h3>
+  </div>
+  <div class="table-wrapper">
+    {% if customers %}
+    <table>
+      <thead>
+        <tr>
+          <th>STT</th><th>Khách hàng</th><th>Loại</th><th>Điện thoại</th>
+          <th>Sản phẩm</th><th>Cảm xúc</th><th>Doanh thu</th><th>Ngày tạo</th><th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td style="color:var(--text-muted);font-size:13px">{{ forloop.counter }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:38px;height:38px;border-radius:10px;background:{% if c.is_vip %}var(--grad-3){% else %}var(--grad-1){% endif %};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0">
+                {{ c.name|first|upper }}
+              </div>
+              <div>
+                <a href="{% url 'customers:detail' c.pk %}" style="font-weight:600;color:var(--text-primary);text-decoration:none;font-size:14px;display:block">{{ c.name }}</a>
+                <span style="font-size:12px;color:var(--text-muted)">{{ c.customer_id }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{% if c.is_vip %}<span class="badge badge-vip">⭐ VIP</span>{% else %}<span class="badge badge-regular">👤 Thường</span>{% endif %}</td>
+          <td style="font-size:13px">{{ c.phone|default:"—" }}</td>
+          <td style="font-size:13px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary)">{{ c.product|default:"—" }}</td>
+          <td style="font-size:13px;white-space:nowrap">{{ c.sentiment_emoji }} {{ c.get_satisfaction_label_display|default:"—" }}</td>
+          <td style="font-weight:600;color:var(--accent-3);font-size:14px">{{ c.total_amount|default:0 }}</td>
+          <td style="font-size:12px;color:var(--text-muted)">{{ c.created_at|date:"d/m/Y" }}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <a href="{% url 'customers:detail' c.pk %}" class="btn btn-secondary btn-icon btn-sm" title="Xem">👁</a>
+              <a href="{% url 'customers:edit' c.pk %}" class="btn btn-secondary btn-icon btn-sm" title="Sửa">✏️</a>
+              {% if request.user.is_admin_user %}
+              <a href="{% url 'customers:delete' c.pk %}" class="btn btn-danger btn-icon btn-sm" title="Xóa">🗑</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">Không tìm thấy khách hàng nào</div>
+      <div class="empty-text">{% if search %}Thử tìm với từ khóa khác{% else %}Bắt đầu bằng cách thêm khách hàng mới{% endif %}</div>
+      {% if not search %}<a href="{% url 'customers:add' %}" class="btn btn-primary" style="margin-top:20px">➕ Thêm khách hàng</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if page_obj.has_other_pages %}
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:24px;flex-wrap:wrap">
+  {% if page_obj.has_previous %}
+    <a href="?q={{ search }}&type={{ filter_type }}&page={{ page_obj.previous_page_number }}"
+       class="btn btn-secondary btn-sm">&laquo; Trang trước</a>
+  {% endif %}
+  {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}
+      <span class="btn btn-primary btn-sm" style="cursor:default">{{ num }}</span>
+    {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+      <a href="?q={{ search }}&type={{ filter_type }}&page={{ num }}" class="btn btn-secondary btn-sm">{{ num }}</a>
+    {% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}
+    <a href="?q={{ search }}&type={{ filter_type }}&page={{ page_obj.next_page_number }}"
+       class="btn btn-secondary btn-sm">Trang sau &raquo;</a>
+  {% endif %}
+  <span style="color:var(--text-muted);font-size:13px">Trang {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</span>
+</div>
+{% endif %}{% endblock %}
+
+{% block extra_js %}
+<script>
+// Live search with debounce
+let t;
+document.getElementById('search-input').addEventListener('input', function() {
+  clearTimeout(t);
+  t = setTimeout(() => {
+    const q = this.value;
+    const type = new URLSearchParams(window.location.search).get('type') || '';
+    window.location.href = '?q=' + encodeURIComponent(q) + (type ? '&type=' + type : '');
+  }, 600);
+});
+</script>
+{% endblock %}

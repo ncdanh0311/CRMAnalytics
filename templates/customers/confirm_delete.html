@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Xác nhận xóa - QLKH{% endblock %}
+{% block page_title %}Xác nhận xóa{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'customers:detail' customer.pk %}" class="btn btn-secondary btn-sm">← Quay lại</a>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:520px;margin:60px auto;text-align:center">
+  <div class="card" style="padding:48px 40px;background:rgba(239,68,68,.05);border-color:rgba(239,68,68,.2)">
+    <div style="font-size:60px;margin-bottom:20px">⚠️</div>
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:12px">Xác nhận xóa khách hàng</h2>
+    <p style="color:var(--text-secondary);font-size:15px;margin-bottom:8px">Bạn có chắc muốn xóa khách hàng:</p>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:20px 0">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">{{ customer.name }}</div>
+      <div style="font-size:13px;color:var(--text-muted)">Mã: {{ customer.customer_id }}</div>
+    </div>
+    <p style="color:var(--accent-danger);font-size:13px;margin-bottom:28px">⚠️ Hành động này không thể hoàn tác!</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <a href="{% url 'customers:detail' customer.pk %}" class="btn btn-secondary" style="padding:12px 28px">Hủy bỏ</a>
+      <form method="post" style="display:inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger" style="padding:12px 28px">🗑 Xác nhận xóa</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

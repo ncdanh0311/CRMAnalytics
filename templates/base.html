@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}QLKH - Quản Lý Khách Hàng{% endblock %}</title>
+<meta name="description" content="Hệ thống quản lý khách hàng chuyên nghiệp">
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="icon" href="{% static 'images/brand/logo.png' %}">
+{% block extra_head %}{% endblock %}
+<script>
+  (function(){
+    var t = localStorage.getItem('qlkh-theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="{% url 'customers:dashboard' %}" class="brand-logo">
+        <div class="brand-icon"><img src="{% static 'images/icons/inventory/person_icon.png' %}" alt="QLKH"></div>
+        <div class="brand-text">
+          <span class="brand-name">QLKH System</span>
+          <span class="brand-sub">Quản lý khách hàng</span>
+        </div>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Tổng quan</div>
+        <a href="{% url 'customers:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <span class="icon"><img src="{% static 'images/icons/inventory/analytics_icon.png' %}" alt=""></span> Dashboard
+        </a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Khách hàng</div>
+        <a href="{% url 'customers:list' %}" class="nav-item {% if request.resolver_match.url_name == 'list' %}active{% endif %}">
+          <span class="icon"><img src="{% static 'images/icons/inventory/list_icon.png' %}" alt=""></span> Danh sách
+        </a>
+        <a href="{% url 'customers:add' %}" class="nav-item {% if request.resolver_match.url_name == 'add' %}active{% endif %}">
+          <span class="icon"><img src="{% static 'images/icons/inventory/person_icon.png' %}" alt=""></span> Thêm mới
+        </a>
+      </div>
+      {% if user.is_admin_user %}
+      <div class="nav-section">
+        <div class="nav-label">Quản trị</div>
+        <a href="{% url 'accounts:register' %}" class="nav-item {% if request.resolver_match.url_name == 'register' %}active{% endif %}">
+          <span class="icon"><img src="{% static 'images/icons/inventory/person_icon.png' %}" alt=""></span> Tài khoản
+        </a>
+        <a href="{% url 'admin:index' %}" class="nav-item" target="_blank">
+          <span class="icon"><img src="{% static 'images/icons/inventory/settings_icon.png' %}" alt=""></span> Admin Panel
+        </a>
+      </div>
+      {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">{{ user.username|first|upper }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ user.username }}</div>
+          <div class="user-role">{{ user.get_role_display }}</div>
+        </div>
+        <form method="post" action="{% url 'accounts:logout' %}" style="margin:0">
+          {% csrf_token %}
+          <button type="submit" class="user-logout" title="Đăng xuất">
+            <img src="{% static 'images/icons/inventory/returns_icon.png' %}" alt="Đăng xuất" class="inline-icon">
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:16px">
+        <button id="sidebar-toggle" style="background:none;border:none;color:var(--text-secondary);font-size:22px;cursor:pointer;display:none">☰</button>
+        <h1 class="page-title"><span>{% block page_title %}Dashboard{% endblock %}</span></h1>
+      </div>
+      <div class="topbar-actions">
+        <button id="theme-toggle" title="Chuyển đổi giao diện" aria-label="Toggle theme">
+          <span class="theme-track">
+            <span>🌙</span>
+            <span>☀️</span>
+          </span>
+          <span class="theme-thumb"></span>
+        </button>
+        {% block topbar_actions %}{% endblock %}
+      </div>
+    </header>
+
+    {% if messages %}
+    <div class="messages-list">
+      {% for msg in messages %}
+      <div class="alert alert-{% if msg.tags == 'error' %}error{% elif msg.tags == 'success' %}success{% elif msg.tags == 'warning' %}warning{% else %}info{% endif %}">
+        <span>{% if msg.tags == 'success' %}✅{% elif msg.tags == 'error' %}❌{% elif msg.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+        {{ msg }}
+        <button class="alert-close">×</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="page-content">{% block content %}{% endblock %}</div>
+  </main>
+</div>
+{% else %}
+{% if messages %}
+<div class="messages-list">
+  {% for msg in messages %}
+  <div class="alert alert-{% if msg.tags == 'error' %}error{% elif msg.tags == 'success' %}success{% else %}info{% endif %}">
+    <span>{% if msg.tags == 'success' %}✅{% elif msg.tags == 'error' %}❌{% else %}ℹ️{% endif %}</span>
+    {{ msg }}
+    <button class="alert-close">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

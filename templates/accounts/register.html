@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý tài khoản - QLKH{% endblock %}
+{% block page_title %}Quản lý tài khoản{% endblock %}
+{% block topbar_actions %}
+  <span style="font-size:13px;color:var(--text-muted)">Chỉ admin mới xem được trang này</span>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1.5fr;gap:28px;align-items:start">
+
+  <!-- Form tạo tài khoản -->
+  <div class="card">
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:24px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">🔑</span> Tạo tài khoản mới
+    </h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group" style="margin-bottom:18px">
+        <label>{{ form.username.label }}</label>{{ form.username }}
+      </div>
+      <div class="form-group" style="margin-bottom:18px">
+        <label>{{ form.role.label }}</label>{{ form.role }}
+      </div>
+      <div class="form-group" style="margin-bottom:18px">
+        <label>{{ form.password.label }}</label>{{ form.password }}
+      </div>
+      <div class="form-group" style="margin-bottom:24px">
+        <label>{{ form.password2.label }}</label>{{ form.password2 }}
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+        ✅ Tạo tài khoản
+      </button>
+    </form>
+  </div>
+
+  <!-- Danh sách tài khoản -->
+  <div class="card">
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">👥</span> Danh sách người dùng
+      <span style="margin-left:auto;background:var(--bg-card);border:1px solid var(--border);padding:3px 10px;border-radius:20px;font-size:13px;font-weight:600">{{ users|length }}</span>
+    </h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Tên đăng nhập</th><th>Vai trò</th><th>Ngày tạo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:var(--text-muted)">{{ forloop.counter }}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;border-radius:8px;background:var(--grad-1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0">
+                  {{ u.username|first|upper }}
+                </div>
+                <span style="font-weight:500">{{ u.username }}</span>
+                {% if u == request.user %}<span style="font-size:11px;color:var(--accent);margin-left:4px">(bạn)</span>{% endif %}
+              </div>
+            </td>
+            <td>
+              {% if u.role == 'admin' %}
+                <span class="badge badge-admin">👑 Admin</span>
+              {% else %}
+                <span class="badge badge-user">👤 Nhân viên</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--text-muted);font-size:13px">{{ u.date_joined|date:"d/m/Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:30px">Chưa có tài khoản</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

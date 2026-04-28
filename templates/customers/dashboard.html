@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard - QLKH{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'customers:add' %}" class="btn btn-primary btn-sm">➕ Thêm khách hàng</a>
+{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-section">
+  <div class="section-head">
+    <h2 class="section-title">Tổng quan</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card purple">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">{{ total }}</div>
+      <div class="stat-label">Tổng khách hàng</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-value">{{ vip_count }}</div>
+      <div class="stat-label">Khách VIP</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-icon">👤</div>
+      <div class="stat-value">{{ regular_count }}</div>
+      <div class="stat-label">Khách thường</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value" style="font-size:20px" id="revenue-val">{{ total_revenue|default:0 }}</div>
+      <div class="stat-label">Tổng doanh thu (VNĐ)</div>
+    </div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="section-head">
+    <h2 class="section-title">Phân tích AI</h2>
+  </div>
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;color:var(--text-secondary)">📈 Xu hướng doanh thu + dự báo</h3>
+      <div class="chart-wrapper"><div id="revenueTrendChart"></div></div>
+    </div>
+    <div class="card chart-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;color:var(--text-secondary)">🎯 Mức độ hài lòng</h3>
+      <div class="chart-wrapper chart-wrapper-sm"><div id="sentimentChart"></div></div>
+    </div>
+  </div>
+  <div class="card chart-card" style="margin-bottom:28px">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;color:var(--text-secondary)">🧩 Phân cụm K-means (Số lượng × Doanh thu)</h3>
+    <div class="chart-wrapper chart-wrapper-lg"><div id="clusterScatterChart"></div></div>
+  </div>
+</section>
+
+<section class="dashboard-section">
+  <div class="section-head">
+    <h2 class="section-title">Danh sách vận hành</h2>
+  </div>
+  <div class="dashboard-bottom-grid">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h3 style="font-size:15px;font-weight:700;color:var(--text-secondary)">🕐 Khách hàng mới nhất</h3>
+        <a href="{% url 'customers:list' %}" class="btn btn-secondary btn-sm">Xem tất cả →</a>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Khách hàng</th><th>Loại</th><th>Sản phẩm</th><th>Doanh thu</th></tr></thead>
+          <tbody>
+            {% for c in recent_customers %}
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:9px;background:{% if c.is_vip %}var(--grad-3){% else %}var(--grad-1){% endif %};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">
+                    {{ c.name|first|upper }}
+                  </div>
+                  <div>
+                    <a href="{% url 'customers:detail' c.pk %}" style="font-weight:600;color:var(--text-primary);text-decoration:none;font-size:14px">{{ c.name }}</a>
+                    <div style="font-size:12px;color:var(--text-muted)">{{ c.customer_id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>{% if c.is_vip %}<span class="badge badge-vip">⭐ VIP</span>{% else %}<span class="badge badge-regular">👤 Thường</span>{% endif %}</td>
+              <td style="font-size:13px;color:var(--text-secondary);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.product }}</td>
+              <td style="font-size:13px;font-weight:600;color:var(--accent-3)">{{ c.total_amount|default:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty-state"><div class="empty-icon">💭</div><div class="empty-title">Chưa có dữ liệu</div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;color:var(--text-secondary)">🏆 Sản phẩm bán chạy</h3>
+      {% for p in top_products %}
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:28px;height:28px;border-radius:8px;background:var(--grad-1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">{{ forloop.counter }}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.product|default:"(Chưa có)" }}</div>
+          <div style="font-size:12px;color:var(--text-muted)">SL: {{ p.total_qty }}</div>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent-3);white-space:nowrap">{{ p.total_rev|default:0 }}</div>
+      </div>
+      {% empty %}
+      <div class="empty-state"><div class="empty-icon">📦</div><div class="empty-title">Chưa có sản phẩm</div></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const TREND_DATA = {{ trend_data|safe }};
+const SENTIMENT  = {{ sentiment_counts|safe }};
+const CLUSTER_POINTS = {{ cluster_points|safe }};
+
+/* ── Format revenue stat ── */
+const revEl = document.getElementById('revenue-val');
+if (revEl) {
+  const raw = parseInt(revEl.textContent.replace(/\D/g,'')) || 0;
+  revEl.textContent = raw.toLocaleString('vi-VN') + ' ₫';
+}
+
+/* ── Theme-aware palette ── */
+function getTheme() {
+  return document.documentElement.getAttribute('data-theme') || 'dark';
+}
+
+function buildChartBase() {
+  const isDark = getTheme() === 'dark';
+  return {
+    chart: {
+      height: '100%',
+      parentHeightOffset: 0,
+      toolbar: { show: false },
+      background: 'transparent',
+      foreColor: isDark ? '#9898b0' : '#4b5563',
+      animations: { enabled: true, easing: 'easeinout', speed: 700 },
+    },
+    stroke: { curve: 'smooth', width: 3 },
+    grid: {
+      borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+    },
+    theme: { mode: isDark ? 'dark' : 'light' },
+    tooltip: {
+      theme: isDark ? 'dark' : 'light',
+    },
+    legend: {
+      labels: { colors: isDark ? '#9898b0' : '#4b5563' },
+    },
+  };
+}
+
+/* ── Series data (shared) ── */
+const allTrendLabels  = [...TREND_DATA.labels, ...TREND_DATA.forecast_labels];
+const actualSeries    = [...TREND_DATA.actual,  ...Array(TREND_DATA.forecast.length).fill(null)];
+const trendSeriesData = [...TREND_DATA.trend,   ...Array(TREND_DATA.forecast.length).fill(null)];
+const forecastSeries  = [...Array(TREND_DATA.actual.length).fill(null), ...TREND_DATA.forecast];
+
+const grouped = CLUSTER_POINTS.reduce((acc, item) => {
+  const cid = item.cluster_id ?? 0;
+  if (!acc[cid]) acc[cid] = [];
+  acc[cid].push({ x: item.x, y: item.y });
+  return acc;
+}, {});
+const scatterSeries = Object.keys(grouped).map(cid => ({
+  name: `Cụm ${cid}`, data: grouped[cid],
+}));
+
+/* ── Chart instances ── */
+let chartRevenue, chartSentiment, chartCluster;
+
+function renderCharts() {
+  /* Destroy old instances */
+  [chartRevenue, chartSentiment, chartCluster].forEach(c => c && c.destroy());
+
+  const base = buildChartBase();
+  const isDark = getTheme() === 'dark';
+
+  /* Colours that work in both modes */
+  const C_PURPLE  = '#8b5cf6';
+  const C_CYAN    = '#06b6d4';
+  const C_GREEN   = '#10b981';
+  const C_AMBER   = '#f59e0b';
+  const C_RED     = '#ef4444';
+
+  /* ── Revenue trend chart ── */
+  chartRevenue = new ApexCharts(document.querySelector('#revenueTrendChart'), {
+    ...base,
+    series: [
+      { name: 'Doanh thu thực tế', type: 'column', data: actualSeries },
+      { name: 'Đường xu hướng',    type: 'line',   data: trendSeriesData },
+      { name: 'Dự báo',            type: 'line',   data: forecastSeries },
+    ],
+    xaxis: {
+      categories: allTrendLabels,
+      labels: { style: { colors: isDark ? '#9898b0' : '#6b7280' } },
+    },
+    yaxis: {
+      labels: {
+        style: { colors: isDark ? '#9898b0' : '#6b7280' },
+        formatter: val => Math.round(val || 0).toLocaleString('vi-VN'),
+      },
+    },
+    colors: [C_PURPLE, C_CYAN, C_GREEN],
+    fill: {
+      type: ['gradient', 'solid', 'solid'],
+      gradient: {
+        shade: isDark ? 'dark' : 'light',
+        type: 'vertical',
+        shadeIntensity: isDark ? 0.5 : 0.3,
+        opacityFrom: isDark ? 0.6 : 0.4,
+        opacityTo: isDark ? 0.15 : 0.05,
+      },
+    },
+    tooltip: {
+      ...base.tooltip,
+      y: { formatter: val => `${Math.round(val || 0).toLocaleString('vi-VN')} ₫` },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 6,
+        columnWidth: '55%',
+      },
+    },
+  });
+  chartRevenue.render();
+
+  /* ── Sentiment donut ── */
+  chartSentiment = new ApexCharts(document.querySelector('#sentimentChart'), {
+    ...base,
+    chart: { ...base.chart, type: 'donut' },
+    series: [SENTIMENT.satisfied || 0, SENTIMENT.neutral || 0, SENTIMENT.dissatisfied || 0],
+    labels: ['Hài lòng', 'Trung lập', 'Không hài lòng'],
+    colors: [C_GREEN, C_CYAN, C_AMBER],
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '62%',
+          labels: {
+            show: true,
+            total: {
+              show: true,
+              label: 'Tổng',
+              color: isDark ? '#9898b0' : '#6b7280',
+              formatter: w => w.globals.seriesTotals.reduce((a, b) => a + b, 0),
+            },
+            value: { color: isDark ? '#f1f1f5' : '#111827' },
+          },
+        },
+      },
+    },
+    dataLabels: { style: { colors: ['#fff'] } },
+    legend: {
+      ...base.legend,
+      position: 'bottom',
+    },
+  });
+  chartSentiment.render();
+
+  /* ── Cluster scatter ── */
+  chartCluster = new ApexCharts(document.querySelector('#clusterScatterChart'), {
+    ...base,
+    chart: { ...base.chart, type: 'scatter', zoom: { enabled: true, type: 'xy' } },
+    series: scatterSeries,
+    xaxis: {
+      title: { text: 'Số lượng', style: { color: isDark ? '#9898b0' : '#6b7280' } },
+      tickAmount: 8,
+      labels: { style: { colors: isDark ? '#9898b0' : '#6b7280' } },
+    },
+    yaxis: {
+      title: { text: 'Doanh thu (VNĐ)', style: { color: isDark ? '#9898b0' : '#6b7280' } },
+      labels: {
+        style: { colors: isDark ? '#9898b0' : '#6b7280' },
+        formatter: val => Math.round(val).toLocaleString('vi-VN'),
+      },
+    },
+    colors: [C_PURPLE, C_CYAN, C_GREEN, C_AMBER, C_RED, '#22c55e'],
+    markers: { size: 6, hover: { size: 8 } },
+    tooltip: {
+      ...base.tooltip,
+      x: { formatter: val => `${val} sản phẩm` },
+      y: { formatter: val => `${Math.round(val).toLocaleString('vi-VN')} ₫` },
+    },
+  });
+  chartCluster.render();
+}
+
+/* ── Initial render ── */
+renderCharts();
+
+/* ── Re-render when theme changes ── */
+new MutationObserver(() => renderCharts()).observe(
+  document.documentElement,
+  { attributes: true, attributeFilter: ['data-theme'] }
+);
+</script>
+{% endblock %}
