@@ -2,36 +2,36 @@
 
 Ung dung Django quan ly khach hang cho doi CSKH va marketing. He thong giup luu tru thong tin khach hang, phan tich feedback tieng Viet, phan nhom khach hang bang AI, va hien thi dashboard tong quan doanh thu.
 
-## Muc tieu nghiep vu
+## 1. Muc tieu nghiep vu
 
 Du an tap trung vao 3 bai toan chinh:
 
-- phat hien feedback tieu cuc de CSKH xu ly som
-- phan nhom khach hang de uu tien marketing va cham soc
-- theo doi doanh thu, top san pham, va xu huong ban hang
+1. Phat hien feedback tieu cuc de CSKH xu ly som.
+2. Phan nhom khach hang de uu tien marketing va cham soc.
+3. Theo doi doanh thu, top san pham, va xu huong ban hang.
 
-## Tinh nang chinh
+## 2. Tinh nang chinh
 
-- CRUD khach hang
-- Dashboard voi ApexCharts
-- Sentiment analysis cho feedback tieng Viet
-- Clustering khach hang bang K-means
-- API-first voi DRF + JWT + Swagger
-- RBAC: admin va nhan vien
-- Ho tro Celery cho xu ly nen
+1. CRUD khach hang.
+2. Dashboard thong ke voi ApexCharts.
+3. Sentiment analysis cho feedback tieng Viet.
+4. Clustering khach hang bang K-means.
+5. API-first voi DRF + JWT + Swagger.
+6. RBAC voi 2 vai tro: admin va nhan vien.
+7. Ho tro Celery cho xu ly nen.
 
-## Y nghia AI trong du an
+## 3. Y nghia AI trong du an
 
-Clustering khong chi tra ve `cluster_id`, ma con duoc dien giai thanh cac nhom nghiep vu nhu:
+Clustering khong chi tra ve `cluster_id`, ma con duoc dien giai thanh cac nhom nghiep vu de de su dung hon:
 
-- khach hang gia tri cao
-- khach hang mua deu
-- khach hang co nguy co roi bo
-- khach hang tiem nang tang truong
+1. Khach hang gia tri cao.
+2. Khach hang mua deu.
+3. Khach hang co nguy co roi bo.
+4. Khach hang tiem nang tang truong.
 
-Dieu nay giup dashboard de doc hon va co gia tri kinh doanh ro hon.
+Dieu nay giup dashboard de doc hon va the hien ro gia tri kinh doanh cua AI.
 
-## Cai dat nhanh
+## 4. Cai dat nhanh
 
 ```bash
 pip install -r requirements.txt
@@ -41,14 +41,14 @@ python manage.py runserver
 
 Truy cap:
 
-- Web: `http://127.0.0.1:8000/`
-- Swagger: `http://127.0.0.1:8000/api/docs/`
+1. Web: `http://127.0.0.1:8000/`
+2. Swagger: `http://127.0.0.1:8000/api/docs/`
 
 Tai khoan mac dinh: `admin / admin123`
 
-## Du lieu mau demo
+## 5. Du lieu mau demo
 
-Tao du lieu de dashboard dep hon:
+Tao du lieu de dashboard day hon:
 
 ```bash
 python manage.py seed_customers --count 1000
@@ -60,15 +60,17 @@ Neu muon reset truoc khi seed:
 python manage.py seed_customers --count 1000 --reset
 ```
 
-## Async voi Celery
+## 6. Async voi Celery
 
-Neu muon chay sentiment/clustering o background:
+Neu muon chay sentiment va clustering o background, cau hinh:
 
 ```env
 AI_ASYNC_ENABLED=True
 CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/1
 ```
+
+Sau do chay:
 
 ```bash
 celery -A qlkh_project worker -l info
@@ -77,36 +79,36 @@ celery -A qlkh_project beat -l info
 
 Neu khong bat Celery, he thong van chay o che do dong bo.
 
-## API chinh
+## 7. API chinh
 
-- `POST /api/auth/token/` lay JWT
-- `GET /api/v1/customers/` danh sach khach hang
-- `POST /api/v1/customers/` tao khach hang
-- `GET /api/v1/customers/stats/` thong ke tong quan
-- `GET /api/v1/customers/cluster/?k=3` phan cum khach hang
-- `GET /api/v1/customers/forecast/` du bao doanh thu
+1. `POST /api/auth/token/`: lay JWT.
+2. `GET /api/v1/customers/`: lay danh sach khach hang.
+3. `POST /api/v1/customers/`: tao khach hang.
+4. `GET /api/v1/customers/stats/`: thong ke tong quan.
+5. `GET /api/v1/customers/cluster/?k=3`: phan cum khach hang.
+6. `GET /api/v1/customers/forecast/`: du bao doanh thu.
 
-## Logging va CI
+## 8. Logging va CI
 
-- Log ung dung: `logs/app.log`
-- CI workflow: `.github/workflows/ci.yml`
+1. Log ung dung: `logs/app.log`
+2. CI workflow: `.github/workflows/ci.yml`
 
-## Tech Stack
+## 9. Tech Stack
 
-- Django 5.2
-- Django REST Framework
-- SimpleJWT
-- drf-spectacular
-- scikit-learn
-- underthesea
-- Celery + Redis
+1. Django 5.2
+2. Django REST Framework
+3. SimpleJWT
+4. drf-spectacular
+5. scikit-learn
+6. underthesea
+7. Celery + Redis
 
-## Cau truc
+## 10. Cau truc thu muc
 
-- `customers/`: model, views, analytics, tasks
-- `api/`: serializer, viewset, JWT, Swagger
-- `sentiment/`: xu ly feedback
-- `accounts/`: user va phan quyen
-- `qlkh_project/`: settings, urls, celery
+1. `customers/`: model, views, analytics, tasks.
+2. `api/`: serializer, viewset, JWT, Swagger.
+3. `sentiment/`: xu ly feedback.
+4. `accounts/`: user va phan quyen.
+5. `qlkh_project/`: settings, urls, celery.
 
-Chi tiet hon xem trong [ARCHITECTURE.md](ARCHITECTURE.md).
+Chi tiet hon xem trong [ARCHITECTURE.md](d:/Projects/CustomerApplication/ARCHITECTURE.md).
