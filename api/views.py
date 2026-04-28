@@ -85,6 +85,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
                 "n_clusters": result.n_clusters,
                 "points": result.points,
                 "centers": result.centers,
+                "summaries": result.summaries,
             }
         )
 

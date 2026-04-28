@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
 
 
@@ -79,7 +80,7 @@ class Customer(models.Model):
         if self.quantity and self.unit_price:
             self.total_amount = self.quantity * self.unit_price
         # Bỏ qua phân tích cảm xúc khi bulk_update (performance)
-        if not getattr(self, '_skip_sentiment', False):
+        if not getattr(self, '_skip_sentiment', False) and not getattr(settings, 'AI_ASYNC_ENABLED', False):
             self._sync_sentiment()
         super().save(*args, **kwargs)
 

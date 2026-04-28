@@ -11,3 +11,11 @@
 2026-04-19 12:03:28 | INFO | controllers.auth_controller | Đăng nhập thành công: admin (admin)
 2026-04-19 12:10:58 | INFO | controllers.auth_controller | Đăng nhập thành công: admin (admin)
 2026-04-19 12:24:16 | INFO | controllers.auth_controller | Đăng nhập thành công: admin (admin)
+[2026-04-28 18:05:17,556] INFO customers.tasks Sentiment analysed for customer KH004 with label=positive via underthesea
+[2026-04-28 18:05:17,585] INFO customers.tasks Dashboard analytics refreshed with 3 clusters and 4 customers
+[2026-04-28 18:05:18,620] INFO customers.tasks Sentiment cleared for customer KH777
+[2026-04-28 18:05:22,912] WARNING django.request Forbidden: /api/v1/customers/1/
+[2026-04-28 18:05:44,102] INFO customers.tasks Sentiment analysed for customer KH004 with label=positive via underthesea
+[2026-04-28 18:05:44,129] INFO customers.tasks Dashboard analytics refreshed with 3 clusters and 4 customers
+[2026-04-28 18:05:45,016] INFO customers.tasks Sentiment cleared for customer KH777
+[2026-04-28 18:05:48,905] WARNING django.request Forbidden: /api/v1/customers/1/

@@ -1,4 +1,5 @@
 import json
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -41,7 +42,10 @@ def dashboard_view(request):
     CLUSTER_CACHE_KEY = 'dashboard_cluster_result'
     cluster_result = cache.get(CLUSTER_CACHE_KEY)
     if cluster_result is None:
-        cluster_result = run_customer_clustering(n_clusters=3, persist=True)
+        cluster_result = run_customer_clustering(
+            n_clusters=getattr(settings, 'DASHBOARD_CLUSTER_COUNT', 3),
+            persist=True,
+        )
         cache.set(CLUSTER_CACHE_KEY, cluster_result, timeout=600)
 
     # Cache revenue trend 10 phút
@@ -69,6 +73,7 @@ def dashboard_view(request):
         'sentiment_counts': json.dumps(sentiment_map),
         'cluster_points': json.dumps(cluster_result.points),
         'cluster_centers': json.dumps(cluster_result.centers),
+        'cluster_summaries': json.dumps(cluster_result.summaries),
         'trend_data': json.dumps(trend_result),
         'top_products': top_products,
         'recent_customers': recent_customers,
@@ -183,4 +188,3 @@ def customer_delete_view(request, pk):
         messages.success(request, f'Đã xóa khách hàng "{name}" thành công.')
         return redirect('customers:list')
     return render(request, 'customers/confirm_delete.html', {'customer': customer})
-

@@ -17,6 +17,56 @@ class ClusterResult:
     n_clusters: int
     points: list[dict]
     centers: list[dict]
+    summaries: list[dict]
+
+
+def _cluster_profile_templates() -> dict[str, dict[str, str]]:
+    return {
+        "vip_high_value": {
+            "title": "Khach hang gia tri cao",
+            "description": "Nhom co doanh thu va gia tri don hang cao, phu hop upsell/goi chuyen sau.",
+            "recommended_action": "Uu tien CSKH, chuong trinh VIP va cross-sell.",
+        },
+        "loyal_bulk": {
+            "title": "Khach hang mua deu so luong lon",
+            "description": "Tan suat mua on dinh, so luong cao, nhay voi uu dai theo lo.",
+            "recommended_action": "Day combo, chiet khau theo san luong va nhac mua lai.",
+        },
+        "churn_risk": {
+            "title": "Khach hang nguy co roi bo",
+            "description": "Gia tri giao dich thap va de kem feedback tieu cuc, can can thiep som.",
+            "recommended_action": "Canh bao CSKH, goi cham soc va uu dai giu chan.",
+        },
+        "growth_segment": {
+            "title": "Khach hang tiem nang tang truong",
+            "description": "Nhom trung gian, co dau hieu mo rong neu duoc cham dung nhu cau.",
+            "recommended_action": "Remarketing, kich ban nurturing va goi san pham lien quan.",
+        },
+    }
+
+
+def _build_cluster_profiles(centers: list[dict]) -> list[dict]:
+    if not centers:
+        return []
+
+    templates = _cluster_profile_templates()
+    by_revenue = sorted(centers, key=lambda item: item["total_amount"], reverse=True)
+    by_quantity = sorted(centers, key=lambda item: item["quantity"], reverse=True)
+    by_low_value = sorted(centers, key=lambda item: item["total_amount"])
+
+    profile_map: dict[int, str] = {}
+    profile_map[by_revenue[0]["cluster_id"]] = "vip_high_value"
+    profile_map.setdefault(by_quantity[0]["cluster_id"], "loyal_bulk")
+    profile_map[by_low_value[0]["cluster_id"]] = "churn_risk"
+
+    for center in centers:
+        profile_key = profile_map.get(center["cluster_id"], "growth_segment")
+        center["profile_key"] = profile_key
+        center["profile_title"] = templates[profile_key]["title"]
+        center["profile_description"] = templates[profile_key]["description"]
+        center["recommended_action"] = templates[profile_key]["recommended_action"]
+
+    return centers
 
 
 def run_customer_clustering(n_clusters: int = 3, persist: bool = True) -> ClusterResult:
@@ -26,7 +76,7 @@ def run_customer_clustering(n_clusters: int = 3, persist: bool = True) -> Cluste
         )
     )
     if not rows:
-        return ClusterResult(n_clusters=0, points=[], centers=[])
+        return ClusterResult(n_clusters=0, points=[], centers=[], summaries=[])
 
     max_clusters = min(max(1, n_clusters), len(rows))
     if len(rows) == 1:
@@ -74,6 +124,24 @@ def run_customer_clustering(n_clusters: int = 3, persist: bool = True) -> Cluste
                 "total_amount": round(center[2], 2),
             }
         )
+    centers = _build_cluster_profiles(centers)
+
+    cluster_counts: dict[int, int] = {}
+    for point in points:
+        cluster_counts[point["cluster_id"]] = cluster_counts.get(point["cluster_id"], 0) + 1
+
+    summaries = []
+    for center in centers:
+        summaries.append(
+            {
+                "cluster_id": center["cluster_id"],
+                "customer_count": cluster_counts.get(center["cluster_id"], 0),
+                "profile_key": center["profile_key"],
+                "profile_title": center["profile_title"],
+                "profile_description": center["profile_description"],
+                "recommended_action": center["recommended_action"],
+            }
+        )
 
     if persist:
         customers = list(Customer.objects.filter(id__in=id_to_cluster.keys()))
@@ -82,7 +150,12 @@ def run_customer_clustering(n_clusters: int = 3, persist: bool = True) -> Cluste
             customer._skip_sentiment = True  # Tránh gọi sentiment khi bulk_update
         Customer.objects.bulk_update(customers, ["cluster_id"])
 
-    return ClusterResult(n_clusters=max_clusters, points=points, centers=centers)
+    return ClusterResult(
+        n_clusters=max_clusters,
+        points=points,
+        centers=centers,
+        summaries=summaries,
+    )
 
 
 def build_revenue_trend(months_ahead: int = 3) -> dict:

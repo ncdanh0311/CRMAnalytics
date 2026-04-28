@@ -32,6 +32,8 @@ except ModuleNotFoundError:  # pragma: no cover
         return value
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def config_bool(key: str, default: bool) -> bool:
@@ -140,6 +142,17 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
+CELERY_TASK_ALWAYS_EAGER = config_bool('CELERY_TASK_ALWAYS_EAGER', default=False)
+CELERY_BEAT_SCHEDULE = {
+    'refresh-customer-analytics': {
+        'task': 'customers.tasks.refresh_dashboard_analytics',
+        'schedule': 21600,  # every 6 hours
+    },
+    'backfill-missing-sentiment': {
+        'task': 'customers.tasks.backfill_missing_sentiment',
+        'schedule': 1800,  # every 30 minutes
+    },
+}
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
 AUTH_USER_MODEL = 'accounts.User'
@@ -229,4 +242,50 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # ─── AI / ML Settings ─────────────────────────────────────────────────────────
 MAX_CLUSTER_COUNT = config('MAX_CLUSTER_COUNT', default=6, cast=int)
+DASHBOARD_CLUSTER_COUNT = config('DASHBOARD_CLUSTER_COUNT', default=3, cast=int)
 SENTIMENT_CACHE_TIMEOUT = 3600  # 1 hour
+AI_ASYNC_ENABLED = config_bool('AI_ASYNC_ENABLED', default=False)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] {levelname} {name} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'app_file': {
+            'class': 'logging.FileHandler',
+            'filename': LOG_DIR / 'app.log',
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'customers': {
+            'handlers': ['console', 'app_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'sentiment': {
+            'handlers': ['console', 'app_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'app_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}

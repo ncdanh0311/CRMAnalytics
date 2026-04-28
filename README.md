@@ -1,60 +1,112 @@
-# QLKH - Hệ Thống Quản Lý Khách Hàng
+# QLKH - Customer Management with AI Dashboard
 
-Ứng dụng web quản lý khách hàng xây dựng bằng **Django 5.2** theo hướng **API-first** (DRF + JWT + OpenAPI) với dashboard AI.
+Ung dung Django quan ly khach hang cho doi CSKH va marketing. He thong giup luu tru thong tin khach hang, phan tich feedback tieng Viet, phan nhom khach hang bang AI, va hien thi dashboard tong quan doanh thu.
 
-## ✨ Tính năng
+## Muc tieu nghiep vu
 
-- **Dashboard AI**: biểu đồ ApexCharts, phân cụm K-means, dự báo doanh thu tuyến tính
-- **Quản lý khách hàng**: Thêm, sửa, xóa, tìm kiếm nhanh + phản hồi khách hàng
-- **Sentiment tiếng Việt**: tự động phân tích feedback bằng `underthesea` + fallback từ điển
-- **Phân quyền RBAC**: Admin (toàn quyền) / Nhân viên (xem + thêm/sửa)
-- **Xác thực**: Đăng nhập / đăng xuất bảo mật với Django auth
-- **API v1**: CRUD chuẩn REST tại `/api/v1/customers/`, Swagger UI `/api/docs/`
+Du an tap trung vao 3 bai toan chinh:
 
-## 🚀 Cài đặt và chạy
+- phat hien feedback tieu cuc de CSKH xu ly som
+- phan nhom khach hang de uu tien marketing va cham soc
+- theo doi doanh thu, top san pham, va xu huong ban hang
+
+## Tinh nang chinh
+
+- CRUD khach hang
+- Dashboard voi ApexCharts
+- Sentiment analysis cho feedback tieng Viet
+- Clustering khach hang bang K-means
+- API-first voi DRF + JWT + Swagger
+- RBAC: admin va nhan vien
+- Ho tro Celery cho xu ly nen
+
+## Y nghia AI trong du an
+
+Clustering khong chi tra ve `cluster_id`, ma con duoc dien giai thanh cac nhom nghiep vu nhu:
+
+- khach hang gia tri cao
+- khach hang mua deu
+- khach hang co nguy co roi bo
+- khach hang tiem nang tang truong
+
+Dieu nay giup dashboard de doc hon va co gia tri kinh doanh ro hon.
+
+## Cai dat nhanh
 
 ```bash
-# 1. Cài dependencies
 pip install -r requirements.txt
-
-# 2. Tạo database
 python manage.py migrate
-
-# 3. Chạy server
 python manage.py runserver
 ```
 
-Truy cập:
-- Web app: **http://127.0.0.1:8000**
-- Swagger: **http://127.0.0.1:8000/api/docs/**
+Truy cap:
 
-## 🗂️ Dữ liệu khi chạy local (không Docker)
+- Web: `http://127.0.0.1:8000/`
+- Swagger: `http://127.0.0.1:8000/api/docs/`
 
-- File dữ liệu SQLite nằm tại: `data/django_app.db`
-- Miễn là không xóa file này, dữ liệu khách hàng/tài khoản vẫn được giữ nguyên qua các lần chạy.
-- Khi đổi model, chạy:
+Tai khoan mac dinh: `admin / admin123`
+
+## Du lieu mau demo
+
+Tao du lieu de dashboard dep hon:
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+python manage.py seed_customers --count 1000
 ```
 
-- Khi chuyển máy, copy cả project (đặc biệt thư mục `data/`) để giữ dữ liệu.
-- Nên dùng `venv` để tránh xung đột package giữa các project Python.
+Neu muon reset truoc khi seed:
 
-Tài khoản mặc định: `admin` / `admin123`
+```bash
+python manage.py seed_customers --count 1000 --reset
+```
 
-## 🛠️ Tech Stack
+## Async voi Celery
 
-| Layer | Công nghệ |
-|-------|-----------|
-| Framework | Django 5.2 |
-| API | Django REST Framework, drf-spectacular, SimpleJWT |
-| Database | SQLite (dev) / PostgreSQL (prod qua `DATABASE_URL`) |
-| Static | WhiteNoise |
-| Frontend | HTML + CSS (Dark Theme) |
-| Charts | ApexCharts |
+Neu muon chay sentiment/clustering o background:
 
-## 📁 Cấu trúc
+```env
+AI_ASYNC_ENABLED=True
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/1
+```
 
-Xem chi tiết trong [ARCHITECTURE.md](ARCHITECTURE.md)
+```bash
+celery -A qlkh_project worker -l info
+celery -A qlkh_project beat -l info
+```
+
+Neu khong bat Celery, he thong van chay o che do dong bo.
+
+## API chinh
+
+- `POST /api/auth/token/` lay JWT
+- `GET /api/v1/customers/` danh sach khach hang
+- `POST /api/v1/customers/` tao khach hang
+- `GET /api/v1/customers/stats/` thong ke tong quan
+- `GET /api/v1/customers/cluster/?k=3` phan cum khach hang
+- `GET /api/v1/customers/forecast/` du bao doanh thu
+
+## Logging va CI
+
+- Log ung dung: `logs/app.log`
+- CI workflow: `.github/workflows/ci.yml`
+
+## Tech Stack
+
+- Django 5.2
+- Django REST Framework
+- SimpleJWT
+- drf-spectacular
+- scikit-learn
+- underthesea
+- Celery + Redis
+
+## Cau truc
+
+- `customers/`: model, views, analytics, tasks
+- `api/`: serializer, viewset, JWT, Swagger
+- `sentiment/`: xu ly feedback
+- `accounts/`: user va phan quyen
+- `qlkh_project/`: settings, urls, celery
+
+Chi tiet hon xem trong [ARCHITECTURE.md](ARCHITECTURE.md).
