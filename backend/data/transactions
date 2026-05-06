@@ -1,0 +1,92 @@
+[
+  {
+    "userId": "1753987464945",
+    "type": "deposit",
+    "amount": 1200000,
+    "fee": 0,
+    "netAmount": 1200000,
+    "currency": "VND",
+    "status": "completed",
+    "paymentMethod": "manual_bank_transfer",
+    "reference": "175422934737372cu7lups",
+    "description": "Nạp tiền qua chuyển khoản - undefined",
+    "metadata": {
+      "telegramMessageId": "14",
+      "adminConfirmedBy": "telegram_bot"
+    },
+    "id": "1754229651327zgp7esedp",
+    "createdAt": "2025-08-03T14:00:51.327Z"
+  },
+  {
+    "userId": "1753987464945",
+    "type": "deposit",
+    "amount": 120000,
+    "fee": 0,
+    "netAmount": 120000,
+    "currency": "VND",
+    "status": "completed",
+    "paymentMethod": "manual_bank_transfer",
+    "reference": "17542298294645xftuf3yi",
+    "description": "Nạp tiền qua chuyển khoản - undefined",
+    "metadata": {
+      "telegramMessageId": "15",
+      "adminConfirmedBy": "telegram_bot"
+    },
+    "id": "1754229843925kzuh2vadc",
+    "createdAt": "2025-08-03T14:04:03.925Z"
+  },
+  {
+    "userId": "1753987464945",
+    "type": "deposit",
+    "amount": 100000,
+    "fee": 0,
+    "netAmount": 100000,
+    "currency": "VND",
+    "status": "completed",
+    "paymentMethod": "manual_bank_transfer",
+    "reference": "1754231217577ixfkfktya",
+    "description": "Nạp tiền qua chuyển khoản - undefined",
+    "metadata": {
+      "telegramMessageId": "20",
+      "adminConfirmedBy": "telegram_bot"
+    },
+    "id": "17542312638914f4emvr2l",
+    "createdAt": "2025-08-03T14:27:43.891Z"
+  },
+  {
+    "userId": "1753987464945",
+    "type": "deposit",
+    "amount": 1000000,
+    "fee": 0,
+    "netAmount": 1000000,
+    "currency": "VND",
+    "status": "completed",
+    "paymentMethod": "manual_bank_transfer",
+    "reference": "1754231890325h1w9r9fb5",
+    "description": "Nạp tiền qua chuyển khoản - undefined",
+    "metadata": {
+      "telegramMessageId": "23",
+      "adminConfirmedBy": "telegram_bot"
+    },
+    "id": "1754231908968ha6hubxon",
+    "createdAt": "2025-08-03T14:38:28.968Z"
+  },
+  {
+    "userId": "1753987464945",
+    "type": "deposit",
+    "amount": 123000,
+    "fee": 0,
+    "netAmount": 123000,
+    "currency": "VND",
+    "status": "completed",
+    "paymentMethod": "manual_bank_transfer",
+    "reference": "1754232280368vb6s0kgh9",
+    "description": "Nạp tiền qua chuyển khoản - undefined",
+    "metadata": {
+      "telegramMessageId": "24",
+      "adminConfirmedBy": "telegram_bot"
+    },
+    "id": "1754232288204gp28ydk02",
+    "createdAt": "2025-08-03T14:44:48.204Z"
+  }
+]
