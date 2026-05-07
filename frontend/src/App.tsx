@@ -31,6 +31,8 @@ import BackToTop from "./components/common/BackToTop";
 import NotificationPopup from "./components/common/NotificationPopup";
 import GlobalNotification from "./components/common/GlobalNotification";
 
+import api from "./services/api";
+
 const App = () => {
   const [currentPage, setCurrentPage] = useState<PageType>("home");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -54,16 +56,18 @@ const App = () => {
   });
 
   // Fetch products from API
-  const fetchProducts = async () => {
+  const fetchProducts = async (params?: any) => {
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-        }/api/products`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data.data || []);
+      setLoading(true);
+      const response = await api.product.getAllProducts(params);
+      // DRF might return direct array or paginated object. 
+      // Based on our load_json, it's a list.
+      if (Array.isArray(response)) {
+        setProducts(response);
+      } else if ((response as any).results) {
+        setProducts((response as any).results);
+      } else if ((response as any).data) {
+        setProducts((response as any).data);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -75,15 +79,12 @@ const App = () => {
   // Fetch categories from API
   const fetchCategories = async () => {
     try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-        }/api/categories`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data || []);
-      }
+      const response = await api.category.getAllCategories();
+      // Handle DRF response
+      const categoriesList = Array.isArray(response)
+        ? response
+        : (response as any).results || (response as any).data || [];
+      setCategories(categoriesList);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -94,31 +95,15 @@ const App = () => {
     if (!user) return;
 
     try {
-      const userData = localStorage.getItem("user");
-      if (!userData) return;
-
-      const user = JSON.parse(userData);
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-        }/api/wallet/balance`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.email || user.id}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          setWalletBalance(data.data.balance || 0);
-        }
+      const response = await api.wallet.getBalance();
+      if (response.success && response.data) {
+        setWalletBalance(response.data.balance || 0);
       }
     } catch (error) {
       console.error("Error fetching wallet balance:", error);
     }
   };
+
 
   useEffect(() => {
     fetchProducts();
@@ -404,6 +389,7 @@ const App = () => {
                     categories={categories}
                     onViewDetail={handleViewDetail}
                     onBuyNow={handleBuyNowFromCard}
+                    onRefresh={fetchProducts}
                   />
                 </PageTransition>
               )}

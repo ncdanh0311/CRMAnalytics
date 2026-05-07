@@ -178,7 +178,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
-              Các điều khoản và điều kiện sử dụng dịch vụ của Tân Đoàn Store
+              Các điều khoản và điều kiện sử dụng dịch vụ của CRM Analytics
             </motion.p>
 
             <motion.div
@@ -336,7 +336,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               </h2>
             </div>
             <p className="text-gray-700 leading-relaxed text-lg">
-              Bằng việc truy cập và sử dụng website Tân Đoàn Store, bạn đồng ý
+              Bằng việc truy cập và sử dụng website CRM Analytics, bạn đồng ý
               tuân thủ và bị ràng buộc bởi các điều khoản và điều kiện sử dụng
               này. Nếu bạn không đồng ý với bất kỳ phần nào của các điều khoản
               này, vui lòng không sử dụng dịch vụ của chúng tôi.
@@ -360,7 +360,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               </h2>
             </div>
             <p className="text-gray-700 mb-6 text-lg">
-              Tân Đoàn Store cung cấp dịch vụ bán các sản phẩm số bao gồm:
+              CRM Analytics cung cấp dịch vụ bán các sản phẩm số bao gồm:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-start p-4 bg-green-50 rounded-xl">
@@ -482,7 +482,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
                   <div className="flex items-start">
                     <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-1 flex-shrink-0" />
                     <span className="text-gray-700">
-                      Quyết định hoàn tiền cuối cùng thuộc về Tân Đoàn Store
+                      Quyết định hoàn tiền cuối cùng thuộc về CRM Analytics
                     </span>
                   </div>
                 </div>
@@ -545,7 +545,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
             <div className="bg-indigo-50 rounded-xl p-6">
               <p className="text-gray-700 leading-relaxed text-lg">
                 Tất cả nội dung trên website bao gồm văn bản, hình ảnh, logo,
-                thiết kế đều thuộc quyền sở hữu của Tân Đoàn Store hoặc các đối
+                thiết kế đều thuộc quyền sở hữu của CRM Analytics hoặc các đối
                 tác được ủy quyền. Việc sao chép, phân phối mà không có sự cho
                 phép là bị nghiêm cấm.
               </p>
@@ -569,7 +569,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               </h2>
             </div>
             <p className="text-gray-700 mb-6 text-lg">
-              Tân Đoàn Store không chịu trách nhiệm cho:
+              CRM Analytics không chịu trách nhiệm cho:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
@@ -636,7 +636,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
             </div>
             <div className="bg-pink-50 rounded-xl p-6">
               <p className="text-gray-700 leading-relaxed text-lg">
-                Tân Đoàn Store có quyền cập nhật và thay đổi các điều khoản này
+                CRM Analytics có quyền cập nhật và thay đổi các điều khoản này
                 bất cứ lúc nào. Các thay đổi sẽ có hiệu lực ngay khi được đăng
                 tải trên website. Việc tiếp tục sử dụng dịch vụ sau khi có thay
                 đổi đồng nghĩa với việc bạn chấp nhận các điều khoản mới.
@@ -668,7 +668,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               <div className="bg-blue-50 rounded-xl p-6 text-center">
                 <Mail className="w-8 h-8 text-blue-600 mx-auto mb-3" />
                 <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                <p className="text-gray-700">legal@tandoandev.store</p>
+                <p className="text-gray-700">legal@crmanalytics.vn</p>
               </div>
               <div className="bg-green-50 rounded-xl p-6 text-center">
                 <Phone className="w-8 h-8 text-green-600 mx-auto mb-3" />
@@ -783,7 +783,7 @@ const TermsPage = ({ setCurrentPage }: TermsPageProps) => {
               Liên hệ với chúng tôi
             </motion.button>
             <motion.a
-              href="mailto:legal@tandoandev.store"
+              href="mailto:legal@crmanalytics.vn"
               className="border-2 border-white text-white px-10 py-4 rounded-2xl font-semibold hover:bg-white hover:text-blue-600 transition-all duration-300 transform hover:scale-105"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

@@ -271,7 +271,7 @@ const PrivacyPage = ({ setCurrentPage }: PrivacyPageProps) => {
               </h2>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Tân Đoàn Store cam kết bảo vệ quyền riêng tư và thông tin cá
+                  CRM Analytics cam kết bảo vệ quyền riêng tư và thông tin cá
                   nhân của khách hàng. Chính sách này mô tả cách chúng tôi thu
                   thập, sử dụng, lưu trữ và bảo vệ thông tin của bạn khi sử dụng
                   dịch vụ của chúng tôi.

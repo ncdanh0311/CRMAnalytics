@@ -38,7 +38,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Về Tân Đoàn Store
+              Về CRM Analytics
             </h1>
             <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-6">
               Cửa hàng bán tài khoản license các phần mềm, game, ứng dụng uy tín
@@ -128,7 +128,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
             </h2>
             <div className="prose prose-lg mx-auto text-gray-600">
               <p className="text-lg leading-relaxed mb-6">
-                Tân Đoàn Store được thành lập vào năm 2021 với mục tiêu mang đến
+                CRM Analytics được thành lập vào năm 2021 với mục tiêu mang đến
                 cho người dùng Việt Nam những sản phẩm phần mềm, game và ứng
                 dụng chính hãng với giá cả phải chăng.
               </p>
@@ -196,7 +196,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">
-              Tại sao chọn Tân Đoàn Store?
+              Tại sao chọn CRM Analytics?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Chúng tôi cam kết mang đến cho bạn những giá trị tốt nhất
@@ -294,7 +294,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
               Người sáng lập
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Con người đằng sau thành công của Tân Đoàn Store
+              Con người đằng sau thành công của CRM Analytics
             </p>
           </motion.div>
           <div className="max-w-4xl mx-auto">
@@ -317,7 +317,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
                     Founder, CEO & Developer
                   </p>
                   <p className="text-gray-600 mb-6">
-                    Người sáng lập và phát triển toàn bộ hệ thống Tân Đoàn
+                    Người sáng lập và phát triển toàn bộ hệ thống CRM Analytics
                     Store. Với kinh nghiệm sâu rộng trong lĩnh vực công nghệ và
                     kinh doanh online, anh đảm nhận vai trò từ phát triển sản
                     phẩm đến quản lý vận hành.
@@ -451,7 +451,7 @@ const AboutPage = ({ setCurrentPage }: AboutPageProps) => {
             </h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto text-blue-100">
               Hãy khám phá các giải pháp công nghệ chất lượng cao với giá cả hợp
-              lý tại Tân Đoàn Store
+              lý tại CRM Analytics
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.button

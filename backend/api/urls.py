@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
     UserViewSet, ProductViewSet, ReviewViewSet, 
-    OrderViewSet, WalletViewSet, TransactionViewSet, AdminStatsView
+    OrderViewSet, WalletViewSet, TransactionViewSet, AdminStatsView,
+    ImageUploadView, MultiImageUploadView
 )
 
 router = DefaultRouter()
@@ -18,5 +19,7 @@ urlpatterns = [
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('admin/stats/', AdminStatsView.as_view(), name='admin_stats'),
+    path('admin/upload-image/', ImageUploadView.as_view(), name='upload_image'),
+    path('admin/upload-images/', MultiImageUploadView.as_view(), name='upload_images'),
     path('', include(router.urls)),
 ]

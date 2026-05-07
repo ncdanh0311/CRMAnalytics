@@ -115,7 +115,7 @@ const ContactPage = ({ setCurrentPage }: ContactPageProps) => {
     //   from_phone: formData.phone,
     //   subject: formData.subject,
     //   message: formData.message,
-    //   to_name: "Tân Đoàn Store",
+    //   to_name: "CRM Analytics",
     // };
 
     // return emailjs.send(
@@ -324,7 +324,7 @@ const ContactPage = ({ setCurrentPage }: ContactPageProps) => {
                     <div>
                       <p className="font-semibold text-gray-800">Email</p>
                       <p className="text-gray-600">
-                        tdshopmmo@tandoandev.store
+                        crmanalytics@crmanalytics.vn
                       </p>
                     </div>
                   </div>

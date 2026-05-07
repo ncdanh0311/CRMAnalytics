@@ -65,6 +65,8 @@ interface ProductFormData {
   packages?: ProductPackage[];
 }
 
+import api from "../services/api";
+
 const AdminDashboard = ({
   user,
   onBack,
@@ -75,6 +77,7 @@ const AdminDashboard = ({
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -127,68 +130,38 @@ const AdminDashboard = ({
     packages: [],
   });
 
+
   // Fetch data
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = user.email || user.id;
-
       // Fetch products
-      const productsResponse = await fetch(
-        "http://localhost:5000/api/admin/products",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (productsResponse.ok) {
-        const productsData = await productsResponse.json();
-        setProducts(productsData.data || []);
-      }
+      const productsRes = await api.product.getAllProducts();
+      if (productsRes.success) setProducts(productsRes.data || []);
 
       // Fetch users
-      const usersResponse = await fetch(
-        "http://localhost:5000/api/admin/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        setUsers(usersData.data || []);
-      }
+      const usersRes = await api.user.getAllUsers();
+      if (usersRes.success) setUsers(usersRes.data || []);
 
       // Fetch orders
-      const ordersResponse = await fetch(
-        "http://localhost:5000/api/admin/orders",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (ordersResponse.ok) {
-        const ordersData = await ordersResponse.json();
-        setOrders(ordersData.data || []);
-      }
+      const ordersRes = await api.order.getAllOrders();
+      if (ordersRes.success) setOrders(ordersRes.data || []);
 
       // Fetch categories
-      const categoriesResponse = await fetch(
-        "http://localhost:5000/api/categories"
-      );
-      if (categoriesResponse.ok) {
-        const categoriesData = await categoriesResponse.json();
-        setCategories(categoriesData || []);
-      }
+      const categoriesRes = await api.category.getAllCategories();
+      if (categoriesRes.success) setCategories(categoriesRes.data || []);
+
+      // Fetch admin stats
+      const statsRes = await api.admin.getStats();
+      if (statsRes.success) setStats(statsRes.data);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchData();
@@ -197,8 +170,6 @@ const AdminDashboard = ({
   // Product management
   const handleAddProduct = async () => {
     try {
-      const token = user.email || user.id;
-
       // Prepare product data - exclude price fields if product has packages
       const productData = { ...productForm };
       if (productData.hasPackages) {
@@ -207,16 +178,9 @@ const AdminDashboard = ({
         productData.discount = 0;
       }
 
-      const response = await fetch("http://localhost:5000/api/admin/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(productData),
-      });
+      const response = await api.product.createProduct(productData);
 
-      if (response.ok) {
+      if (response.success) {
         setShowProductForm(false);
         setProductForm({
           name: "",
@@ -256,8 +220,6 @@ const AdminDashboard = ({
     if (!editingProduct) return;
 
     try {
-      const token = user.email || user.id;
-
       // Prepare product data - exclude price fields if product has packages
       const productData = { ...productForm };
       if (productData.hasPackages) {
@@ -266,19 +228,9 @@ const AdminDashboard = ({
         productData.discount = 0;
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/admin/products/${editingProduct.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(productData),
-        }
-      );
+      const response = await api.product.updateProduct(editingProduct.id, productData);
 
-      if (response.ok) {
+      if (response.success) {
         setEditingProduct(null);
         setShowProductForm(false);
         setProductForm({
@@ -315,6 +267,7 @@ const AdminDashboard = ({
     }
   };
 
+
   const handleDeleteProduct = async (
     productId: string,
     productName: string
@@ -328,18 +281,9 @@ const AdminDashboard = ({
     if (!productToDelete) return;
 
     try {
-      const token = user.email || user.id;
-      const response = await fetch(
-        `http://localhost:5000/api/admin/products/${productToDelete}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.product.deleteProduct(productToDelete);
 
-      if (response.ok) {
+      if (response.success) {
         fetchData();
         // Refresh products in main app
         if (onRefreshProducts) {
@@ -354,6 +298,7 @@ const AdminDashboard = ({
       setProductNameToDelete("");
     }
   };
+
 
   const openEditForm = (product: Product) => {
     setEditingProduct(product);
@@ -390,32 +335,18 @@ const AdminDashboard = ({
 
     setUploadingImage(true);
     try {
-      const formData = new FormData();
-      formData.append("image", file);
+      const response = await api.product.uploadImage(file);
 
-      const token = user.email || user.id;
-      const response = await fetch(
-        "http://localhost:5000/api/admin/upload-image",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        const imageUrl = result.data.url; // Sử dụng URL tương đối để lưu vào database
+      if (response.success) {
+        const imageUrl = response.data.url;
         setUploadedImageUrl(imageUrl);
         setProductForm({ ...productForm, image: imageUrl });
       } else {
-        alert("Lỗi khi upload hình ảnh");
+        alert("Lỗi khi upload hình ảnh: " + response.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
-      alert("Lỗi khi upload hình ảnh");
+      alert("Lỗi khi upload hình ảnh: " + error.message);
     } finally {
       setUploadingImage(false);
     }
@@ -439,26 +370,10 @@ const AdminDashboard = ({
 
     setUploadingImages(true);
     try {
-      const formData = new FormData();
-      Array.from(files).forEach((file) => {
-        formData.append("images", file);
-      });
+      const response = await api.product.uploadImages(files);
 
-      const token = user.email || user.id;
-      const response = await fetch(
-        "http://localhost:5000/api/admin/upload-images",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        const imageUrls = result.data.images.map((img: any) => img.url);
+      if (response.success) {
+        const imageUrls = response.data.images.map((img: any) => img.url);
         setUploadedImages([...uploadedImages, ...imageUrls]);
         setProductForm({
           ...productForm,
@@ -467,15 +382,16 @@ const AdminDashboard = ({
           image: productForm.image || imageUrls[0],
         });
       } else {
-        alert("Lỗi khi upload hình ảnh");
+        alert("Lỗi khi upload hình ảnh: " + response.message);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading images:", error);
-      alert("Lỗi khi upload hình ảnh");
+      alert("Lỗi khi upload hình ảnh: " + error.message);
     } finally {
       setUploadingImages(false);
     }
   };
+
 
   const handleMultipleImagesChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -610,53 +526,36 @@ const AdminDashboard = ({
   // Category management
   const handleAddCategory = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/categories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(categoryForm),
-      });
+      const response = await api.category.createCategory(categoryForm);
 
-      if (response.ok) {
+      if (response.success) {
         setShowCategoryForm(false);
         setCategoryForm({ name: "" });
         fetchData();
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Lỗi khi thêm danh mục");
+        alert(response.message || "Lỗi khi thêm danh mục");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding category:", error);
-      alert("Lỗi khi thêm danh mục");
+      alert("Lỗi khi thêm danh mục: " + error.message);
     }
   };
 
   const handleEditCategory = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/categories/${editingCategory.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(categoryForm),
-        }
-      );
+      const response = await api.category.updateCategory(editingCategory.id, categoryForm);
 
-      if (response.ok) {
+      if (response.success) {
         setShowCategoryForm(false);
         setEditingCategory(null);
         setCategoryForm({ name: "" });
         fetchData();
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Lỗi khi cập nhật danh mục");
+        alert(response.message || "Lỗi khi cập nhật danh mục");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating category:", error);
-      alert("Lỗi khi cập nhật danh mục");
+      alert("Lỗi khi cập nhật danh mục: " + error.message);
     }
   };
 
@@ -666,24 +565,19 @@ const AdminDashboard = ({
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/categories/${categoryId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await api.category.deleteCategory(categoryId);
 
-      if (response.ok) {
+      if (response.success) {
         fetchData();
       } else {
-        const errorData = await response.json();
-        alert(errorData.error || "Lỗi khi xóa danh mục");
+        alert(response.message || "Lỗi khi xóa danh mục");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting category:", error);
-      alert("Lỗi khi xóa danh mục");
+      alert("Lỗi khi xóa danh mục: " + error.message);
     }
   };
+
 
   const openEditCategoryForm = (category: any) => {
     setEditingCategory(category);

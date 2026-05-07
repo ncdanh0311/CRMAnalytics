@@ -241,10 +241,10 @@ const VerifyEmailPage: React.FC<VerifyEmailPageProps> = ({
           <p className="text-sm text-gray-500">
             Cần hỗ trợ? Liên hệ{" "}
             <a
-              href="mailto:tdshopmmo@tandoandev.store"
+              href="mailto:crmanalytics@crmanalytics.vn"
               className="text-blue-600 hover:underline"
             >
-              tdshopmmo@tandoandev.store
+              crmanalytics@crmanalytics.vn
             </a>
           </p>
         </div>

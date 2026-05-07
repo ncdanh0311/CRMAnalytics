@@ -63,7 +63,7 @@ const HomePage = ({
               >
                 <motion.img
                   src={logo}
-                  alt="Tân Đoàn Store Logo"
+                  alt="CRM Analytics Logo"
                   className="w-16 h-16 rounded-xl shadow-lg object-cover"
                   whileHover={{
                     scale: 1.1,
@@ -73,7 +73,7 @@ const HomePage = ({
                   transition={{ duration: 0.3 }}
                 />
                 <h1 className="text-5xl md:text-7xl font-bold">
-                  Tân Đoàn Store
+                  CRM Analytics
                 </h1>
               </motion.div>
 

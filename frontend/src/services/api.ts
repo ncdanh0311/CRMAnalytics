@@ -60,23 +60,55 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const url = `${API_BASE_URL}/api${endpoint}`;
+    // Ensure endpoint has trailing slash for Django
+    const normalizedEndpoint = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
+    const url = `${API_BASE_URL}/api${normalizedEndpoint}`;
+
+    const userData = localStorage.getItem("user");
+    let token = null;
+    if (userData) {
+      try {
+        const parsed = JSON.parse(userData);
+        token = parsed.token || parsed.access; // Handle both formats
+      } catch (e) {}
+    }
+
+    const headers: any = {
+      ...options.headers,
+    };
+
+    if (headers["Content-Type"] === undefined) {
+      delete headers["Content-Type"];
+    } else {
+      headers["Content-Type"] = headers["Content-Type"] || "application/json";
+    }
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
 
     const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
       ...options,
+      headers,
     });
 
     const data = await response.json();
 
+    // DRF error responses might not have success: false
     if (!response.ok) {
-      throw new Error(data.message || "API request failed");
+      throw new Error(data.message || data.detail || "API request failed");
     }
 
-    return data;
+    // Wrap data in ApiResponse if not already
+    if (data.success !== undefined) {
+      return data;
+    }
+    return {
+      success: true,
+      data: data,
+      message: "Success",
+    };
   } catch (error) {
     console.error("API Error:", error);
     throw error;
@@ -99,8 +131,12 @@ export const userApi = {
       body: JSON.stringify({ email, password }),
     }),
 
+  // Lấy tất cả user (admin only)
+  getAllUsers: () => apiRequest<User[]>("/users"),
+
   // Lấy thông tin user
   getUser: (id: string) => apiRequest<User>(`/users/${id}`),
+
 
   // Cập nhật thông tin user
   updateUser: (id: string, userData: Partial<User>) =>
@@ -132,8 +168,20 @@ export const userApi = {
 
 // Product API
 export const productApi = {
-  // Lấy tất cả sản phẩm
-  getAllProducts: () => apiRequest<Product[]>("/products"),
+  // Lấy tất cả sản phẩm với filtering và sorting
+  getAllProducts: (params?: any) => {
+    let queryString = "";
+    if (params) {
+      const searchParams = new URLSearchParams();
+      Object.keys(params).forEach((key) => {
+        if (params[key] !== undefined && params[key] !== null) {
+          searchParams.append(key, params[key]);
+        }
+      });
+      queryString = `?${searchParams.toString()}`;
+    }
+    return apiRequest<Product[]>(`/products/${queryString}`);
+  },
 
   // Lấy sản phẩm theo ID
   getProduct: (id: string) => apiRequest<Product>(`/products/${id}`),
@@ -158,13 +206,71 @@ export const productApi = {
       method: "DELETE",
     }),
 
+  // Upload image
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    return apiRequest<any>("/admin/upload-image/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        // Fetch will set Content-Type automatically for FormData
+        "Content-Type": undefined as any,
+      },
+    });
+  },
+
+  // Upload multiple images
+  uploadImages: async (files: FileList) => {
+    const formData = new FormData();
+    Array.from(files).forEach((file) => {
+      formData.append("images", file);
+    });
+    return apiRequest<any>("/admin/upload-images/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Type": undefined as any,
+      },
+    });
+  },
+
   // Lấy sản phẩm theo danh mục
+
   getProductsByCategory: (category: string) =>
     apiRequest<Product[]>(`/products/category/${category}`),
 };
 
+// Category API
+export const categoryApi = {
+  // Lấy tất cả danh mục
+  getAllCategories: () => apiRequest<any[]>("/categories"),
+
+  // Tạo danh mục mới
+  createCategory: (data: any) =>
+    apiRequest<any>("/categories", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  // Cập nhật danh mục
+  updateCategory: (id: string, data: any) =>
+    apiRequest<any>(`/categories/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
+
+  // Xóa danh mục
+  deleteCategory: (id: string) =>
+    apiRequest<void>(`/categories/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+
 // Order API
 export const orderApi = {
+
   // Lấy tất cả đơn hàng
   getAllOrders: () => apiRequest<Order[]>("/orders"),
 
@@ -203,7 +309,13 @@ export const healthApi = {
   getStats: () => apiRequest<any>("/stats"),
 };
 
+// Admin API
+export const adminApi = {
+  getStats: () => apiRequest<any>("/admin/stats"),
+};
+
 // Wallet API
+
 export const walletApi = {
   // Lấy số dư ví
   getBalance: async (): Promise<ApiResponse<Wallet>> => {
@@ -342,6 +454,8 @@ export const walletApi = {
 export default {
   user: userApi,
   product: productApi,
+  category: categoryApi,
   order: orderApi,
+  admin: adminApi,
   health: healthApi,
 };

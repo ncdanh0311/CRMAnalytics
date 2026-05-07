@@ -149,7 +149,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             Tạo tài khoản mới
           </h2>
           <p className="text-gray-600">
-            Tham gia cộng đồng Tân Đoàn Store ngay hôm nay
+            Tham gia cộng đồng CRM Analytics ngay hôm nay
           </p>
         </div>
 

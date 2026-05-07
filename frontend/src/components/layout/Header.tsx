@@ -177,7 +177,7 @@ const Header = ({
               <div className="flex items-center space-x-3">
                 <motion.img
                   src="/images/brand/logo.png"
-                  alt="Tân Đoàn Store Logo"
+                  alt="CRM Analytics Logo"
                   className="w-12 h-12 rounded-xl shadow-lg object-cover"
                   whileHover={{
                     scale: 1.1,
@@ -188,7 +188,7 @@ const Header = ({
                 />
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
-                    Tân Đoàn Store
+                    CRM Analytics
                   </h1>
                 </div>
               </div>

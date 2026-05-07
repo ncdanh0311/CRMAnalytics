@@ -17,8 +17,8 @@ interface FAQItem {
 const faqData: FAQItem[] = [
   {
     id: 1,
-    question: "Tân Đoàn Store có uy tín không?",
-    answer: "Tân Đoàn Store là cửa hàng bán tài khoản license uy tín với hơn 3 năm kinh nghiệm và hơn 1000+ khách hàng tin tưởng. Chúng tôi cam kết hoàn tiền 100% nếu sản phẩm không hoạt động như cam kết.",
+    question: "CRM Analytics có uy tín không?",
+    answer: "CRM Analytics là cửa hàng bán tài khoản license uy tín với hơn 3 năm kinh nghiệm và hơn 1000+ khách hàng tin tưởng. Chúng tôi cam kết hoàn tiền 100% nếu sản phẩm không hoạt động như cam kết.",
     category: "Chung"
   },
   {
@@ -94,11 +94,11 @@ const FAQPage = ({ setCurrentPage }: FAQPageProps) => {
             <div className="flex items-center justify-center gap-4 mb-6">
               <img 
                 src={logo} 
-                alt="Tân Đoàn Store Logo" 
+                alt="CRM Analytics Logo" 
                 className="w-16 h-16 rounded-xl shadow-lg object-cover"
               />
               <h1 className="text-4xl md:text-6xl font-bold">
-                Tân Đoàn Store
+                CRM Analytics
               </h1>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">

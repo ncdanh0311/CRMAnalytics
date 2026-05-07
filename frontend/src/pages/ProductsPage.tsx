@@ -14,6 +14,7 @@ interface ProductsPageProps {
   categories: Category[];
   onViewDetail?: (product: Product) => void;
   onBuyNow?: (product: Product) => void;
+  onRefresh: (params?: any) => void;
 }
 
 const ProductsPage = ({
@@ -21,14 +22,32 @@ const ProductsPage = ({
   categories,
   onViewDetail,
   onBuyNow,
+  onRefresh,
 }: ProductsPageProps) => {
   const { state } = useSearch();
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Filter and sort products
-  const filteredProducts = filterAndSortProducts(products, state);
+  // Sync state to API params
+  useEffect(() => {
+    const params: any = {
+      q: state.query,
+      sort_by: state.sortBy,
+      min_price: state.priceRange.min,
+      max_price: state.priceRange.max,
+      rating: state.rating,
+      in_stock: state.inStock,
+    };
+    if (state.categories.length > 0) {
+      params.category = state.categories.join(",");
+    }
+    onRefresh(params);
+  }, [state.query, state.sortBy, state.priceRange, state.categories, state.rating, state.inStock]);
+
+  // Use products directly as they are now filtered on server
+  const filteredProducts = products;
+
 
   // Handle refresh
   const handleRefresh = () => {

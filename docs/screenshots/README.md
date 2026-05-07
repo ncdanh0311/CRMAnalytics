@@ -1,6 +1,6 @@
 # 📸 Screenshots Directory
 
-Thư mục này chứa các hình ảnh screenshot của ứng dụng Tân Đoàn Store để sử dụng trong README.md.
+Thư mục này chứa các hình ảnh screenshot của ứng dụng CRM Analytics để sử dụng trong README.md.
 
 ## 📁 Cấu trúc thư mục
 
